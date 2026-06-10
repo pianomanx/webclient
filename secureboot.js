@@ -2502,6 +2502,9 @@ else if (!browserUpdate) {
         jsl.push({f:'css/components/meganz/fm-context-menu.css', n: 'fm_context_menu_css', j:2,w:5});
         jsl.push({f:'css/message-dialog.css', n: 'message_dialog_css', j:2,w:5});
         jsl.push({f:'html/transfers.html', n: 'transfers', j:0});
+        jsl.push({f:'js/ui/components/carousel.js', n: 'carousel_js', j: 1, w:1});
+        jsl.push({f:'css/components/carousel.css', n: 'carousel_css', j:2,w:5});
+        jsl.push({f:'js/ui/quota-dialogs.js', n: 'quotadialogs_js', j: 1, w:1});
     } // !is_mobile
 
     // do not change the order...
