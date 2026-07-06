@@ -1431,6 +1431,30 @@ MegaData.prototype.moveNodes = async function(n, t, folderConflictResolution) {
         return getPreEmptiveAttributeChanges(n, p, a) || c && a;
     };
 
+    const log501373 = tryCatch((req, root) => {
+        if (self.buildOlderThan10Days) {
+            return;
+        }
+        const {owner, actors} = mBroadcaster.crossTab;
+        const msg = JSON.stringify([
+            1,
+            buildVersion.website || location.host,
+            [this.RootID, this.InboxID, this.RubbishID],
+            t,
+            req,
+            root,
+            u_type,
+            !!pfid | 0,
+            folderlink,
+            mega.infinity,
+            !!owner | 0,
+            Object(actors).length | 0,
+            this.getStack()
+        ]);
+
+        eventlog(501373, msg);
+    });
+
     // Fire an api request to move a node or a group of them to a specific location.
     const sendAPIRequest = (handles) => {
 
@@ -1456,12 +1480,19 @@ MegaData.prototype.moveNodes = async function(n, t, folderConflictResolution) {
             for (let i = 0; i < targets[t].length; i++) {
                 let n = targets[t][i];
                 const req = {a: 'm', t, n};
+                const root = this.getNodeRoot(req.n);
 
-                if (this.getNodeRoot(req.n) === this.InboxID) {
+                if (root === this.InboxID) {
 
                     mega.devices.ui.ackVaultWriteAccess(req.n, req);
                 }
                 request.push(processmove(req));
+
+                if (!req.vw && (!t || t === this.InboxID
+                    || root === this.InboxID || this.getNodeRoot(t) === this.InboxID)) {
+
+                    log501373(req, root);
+                }
 
                 if ((n = this.getNodeByHandle(n))) {
 
