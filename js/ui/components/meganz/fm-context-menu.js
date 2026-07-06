@@ -700,6 +700,13 @@
             }
             slideshow(mega.ui.contextMenu.selectedItems[0]);
         };
+        const startDl = () => {
+            let dlHandles = mega.ui.contextMenu.selectedItems;
+            if (M.isAlbumsPage(1) || mega.ui.contextMenu.firstAlbum) {
+                dlHandles = mega.gallery.getAlbumsHandles(dlHandles);
+            }
+            M.addDownload(dlHandles);
+        };
         sections.addChild('primary', new MegaContextSection(menu, [
             {
                 buttonId: 'open-item',
@@ -798,12 +805,7 @@
                             text: l[58],
                             icon: 'sprite-fm-mono icon-arrow-down-circle-thin-outline',
                             onClick() {
-                                let dlHandles = mega.ui.contextMenu.selectedItems;
-                                if (M.isAlbumsPage(1) || mega.ui.contextMenu.firstAlbum) {
-                                    dlHandles = mega.gallery.getAlbumsHandles(dlHandles);
-                                }
-
-                                M.addDownload(dlHandles);
+                                startDl();
 
                                 if (M.isAlbumsPage()) {
                                     eventlog(99954);
@@ -827,11 +829,7 @@
                             text: l[5928],
                             icon: 'sprite-fm-mono icon-file-download-thin-outline',
                             onClick() {
-                                let dlHandles = mega.ui.contextMenu.selectedItems;
-                                if (M.isAlbumsPage(1)) {
-                                    dlHandles = mega.gallery.getAlbumsHandles(dlHandles);
-                                }
-                                M.addDownload(dlHandles);
+                                startDl();
 
                                 if (folderlink) {
                                     eventlog(99768);
@@ -858,6 +856,27 @@
                                 M.addDownload(dlHandles, true, preview, zName);
                             }
                         },
+                        {
+                            buttonId: 'megasyncdownload-item',
+                            text: l.download_with_sync,
+                            icon: 'sprite-fm-mono icon-mega-thin-outline',
+                            onClick() {
+                                if (window.useMegaSync && (window.useMegaSync === 2 || window.megasync === 3)) {
+                                    startDl();
+                                }
+                                else {
+                                    megasync.preCheck().then(() => {
+                                        if (!window.useMegaSync || window.useMegaSync === 4) {
+                                            return dlmanager.showMEGASyncOverlay();
+                                        }
+                                        if (window.useMegaSync === 1) {
+                                            return msgDialog('info', '', l.login_sync_err_title, l.login_sync_err_text);
+                                        }
+                                        startDl();
+                                    });
+                                }
+                            }
+                        }
                     ],
                     dropdownText: l[58],
                     dropdownIcon: 'sprite-fm-mono icon-arrow-down-circle-thin-outline',
