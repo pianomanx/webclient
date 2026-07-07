@@ -125,6 +125,7 @@ mega.tpw = new function TransferProgressWidget() {
             function overquota_bannerClose() {
                 $widget.parent().removeClass('banner-shown obq-shown odq-shown');
                 $overQuotaBanners.addClass('hidden');
+                mega.tpw.adjustWidgetHeight();
             });
 
         // upgrade account
@@ -259,6 +260,7 @@ mega.tpw = new function TransferProgressWidget() {
                 $pauseAllBtn.addClass('disabled');
             }
             mega.tpw.updateHeaderAndContent();
+            mega.tpw.adjustWidgetHeight();
         });
     };
 
@@ -377,6 +379,7 @@ mega.tpw = new function TransferProgressWidget() {
         this.applyToRows(reset, this.TYPE_OVERQUOTA);
         this.applyToRows(reset, this.TYPE_ERRORED);
         this.updateHeaderAndContent();
+        this.adjustWidgetHeight();
     };
 
     var clearAndReturnWidget = function() {
@@ -1835,6 +1838,8 @@ mega.tpw = new function TransferProgressWidget() {
     const pos = {};
     const tpwLeftVar = '--tpw-left';
     const tpwTopVar = '--tpw-top';
+    const tpwHeightVar = '--tpw-height';
+    const tpwBannerHeightVar = '--tpw-banner-height';
     const widgetOffsetHeight = () =>  window.psa ? psa.getBannerHeight() : 0;
     const keepWidgetInView = () => {
         const rect = widgetRoot.getBoundingClientRect();
@@ -1850,6 +1855,38 @@ mega.tpw = new function TransferProgressWidget() {
         widgetRoot.style.setProperty(tpwLeftVar, `${pos.lastX}%`);
         widgetRoot.style.setProperty(tpwTopVar, `${pos.lastY}%`);
     };
+
+    scope.adjustWidgetHeight = () => {
+        if (!widgetRoot) {
+            return;
+        }
+        widgetRoot.style.removeProperty(tpwBannerHeightVar);
+        widgetRoot.style.removeProperty(tpwHeightVar);
+        if (
+            !widgetRoot.classList.contains('banner-shown') ||
+            widgetRoot.classList.contains('collapse') ||
+            widgetRoot.classList.contains('expanded')
+        ) {
+            return;
+        }
+        const banner = widgetRoot.querySelector('.banner:not(.hidden)');
+        if (!banner) {
+            return;
+        }
+        const cs = getComputedStyle(widgetRoot);
+        const baseBanner = parseFloat(cs.getPropertyValue(tpwBannerHeightVar));
+        const baseHeight = parseFloat(cs.getPropertyValue(tpwHeightVar));
+        const actualBanner = banner.offsetHeight;
+        if (!baseHeight || !(actualBanner > baseBanner)) {
+            return;
+        }
+        widgetRoot.style.setProperty(tpwBannerHeightVar, `${actualBanner}px`);
+        widgetRoot.style.setProperty(tpwHeightVar, `${baseHeight + actualBanner - baseBanner}px`);
+        if (!scope.isDialog && pos.lastX !== undefined && scope.isWidgetVisibile()) {
+            keepWidgetInView();
+        }
+    };
+
     scope.draggable = (off) => {
         if (off) {
             if (listeners.mousedown) {
@@ -2572,6 +2609,7 @@ mega.tpw = new function TransferProgressWidget() {
         }
         tSleep(0.2).then(() => {
             megaList.resized();
+            scope.adjustWidgetHeight();
         });
         scope.renderView(scope.currView, true);
     };
@@ -2611,6 +2649,7 @@ mega.tpw = new function TransferProgressWidget() {
             eventlog(501073);
         }
         scope.updateHeaderAndContent();
+        scope.adjustWidgetHeight();
         if ($.dialog === 'onboardingDialog') {
             // Reposition onboarding
             $.tresizer();
