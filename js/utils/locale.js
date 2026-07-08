@@ -237,6 +237,14 @@ function setDateTimeFormat(locales, format) {
                 options.hour = 'numeric';
                 options.minute = 'numeric';
                 break;
+            case 23:
+                options.hourCycle = undefined;
+                options.year = 'numeric';
+                options.month = 'long';
+                options.day = 'numeric';
+                options.hour = 'numeric';
+                options.minute = 'numeric';
+                break;
         }
     }
 
@@ -1042,6 +1050,17 @@ function toLocaleTime(unixtime) {
     return locales.startsWith('fr') ? time2date(unixtime, 22).replace(':', ' h ') : time2date(unixtime, 22);
 }
 
+/**
+ * Returns a formatted long date+time string for the given timestamp, respecting the user's locale hour cycle.
+ * @param {Number} unixtime UNIX timestamp in seconds.
+ * @returns {String} Formatted date+time string, e.g. "June 9, 2026 at 2:30 PM".
+ */
+function toLocaleDateTimeLong(unixtime) {
+    'use strict';
+    const {country} = getCountryAndLocales();
+    return time2date(unixtime, fmconfig.uidateformat || country === 'ISO' ? 8 : 23);
+}
+
 //----------------------------------------------------------------------------
 
 // eslint-disable-next-line complexity
@@ -1095,6 +1114,9 @@ mBroadcaster.once('boot_done', function populate_l() {
     // MEGA static hosts
     l.mega_help_host = 'https://help.mega.io';
 
+    l[473] = escapeHTML(l[473])
+        .replace('[A]', '<a class="clickurl" target="_blank" href="/support">')
+        .replace('[/A]', '</a>');
     l[8762] = escapeHTML(l[8762]).replace("[S]", "<span class='red'>").replace("[/S]", "</span>");
     l[208] = escapeHTML(l[208]).replace('[/A]', '</a>');
     l['208a'] = l[208].replace('[A]', '<a href="/terms" class="red clickurl" tabindex="-1">');
@@ -1113,7 +1135,13 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[1943] = escapeHTML(l[1943])
         .replace('[A]', '<a class="clickurl" target="_blank" href="/support">')
         .replace('[/A]', '</a>');
+    l[1954] = escapeHTML(l[1954])
+        .replace('[A]', '<a class="clickurl" target="_blank" href="/support">')
+        .replace('[/A]', '</a>');
     l[1982] = escapeHTML(l[1982]).replace('[A]', '<span class="red">').replace('[/A]', '</span>');
+    l[5929] = escapeHTML(l[5929])
+        .replace('[A]', '<a class="clickurl" target="_blank" href="/support">')
+        .replace('[/A]', '</a>');
     l[5931] = escapeHTML(l[5931]).replace('[A]', '<a href="/fm/account" class="clickurl">').replace('[/A]', '</a>');
     l[6216] = escapeHTML(l[6216])
         .replace('[A1]', '<a href="/fm/account/security/change-email" class="clickurl">')
@@ -1123,6 +1151,9 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[7156] = escapeHTML(l[7156])
         .replace('[A]', '<a href="https://mega.io/mobile" target="_blank" class="clickurl">')
         .replace('[/A]', '</a>');
+    l[7233] = escapeHTML(l[7233])
+        .replace('[A]', '<a class="clickurl" target="_blank" href="/support">')
+        .replace('[/A]', '</a>');
     l[7709] = escapeHTML(l[7709]).replace('[S]', '<span class="complete-text">').replace('[/S]', '</span>');
     l[7991] = escapeHTML(l[7991])
         .replace('%1', '<span class="provider-icon"></span><span class="provider-name"></span>');
@@ -1130,6 +1161,12 @@ mBroadcaster.once('boot_done', function populate_l() {
 
     l[8436] = escapeHTML(l[8436])
         .replace('[/A]', '</a>').replace('[A]', '<a class="red clickurl" target="_blank" href="/support">');
+    l[8853] = escapeHTML(l[8853])
+        .replace('[A]', '<a class="clickurl" target="_blank" href="/support">')
+        .replace('[/A]', '</a>');
+    l[8993] = escapeHTML(l[8993])
+        .replace('[A]', '<a class="clickurl" target="_blank" href="/support">')
+        .replace('[/A]', '</a>');
 
     l[8644] = escapeHTML(l[8644]).replace('[S]', '<span class="green">').replace('[/S]', '</span>');
     l[8651] = escapeHTML(l[8651]).replace('%1', '<span class="header-pro-plan"></span>');
@@ -1233,6 +1270,9 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[/A]', '</a>');
     l[19328] = escapeHTML(l[19328]).replace('[B]', '<b>').replace('[/B]', '</b>');
 
+    l[19508] = escapeHTML(l[19508])
+        .replace('[A]', '<a class="clickurl" target="_blank" href="/support">')
+        .replace('[/A]', '</a>');
     l[19512] = escapeHTML(l[19512]).replace('%1', '<span class="plan-name"></span>')
         .replace('%2', '<span class="user-email"></span>').replace('[B]', '<b>').replace('[/B]', '</b>');
     l[19513] = escapeHTML(l[19513])
@@ -1256,6 +1296,9 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[19849] = escapeHTML(l[19849]).replace('[A]', '<a class="red clickurl" href="/recovery">').replace('[/A]', '</a>');
     l[19851] = escapeHTML(l[19851]).replace('[B]', '<strong class="warning-text">').replace('[/B]', '</strong>');
     l[19857] = escapeHTML(l[19857]).replace('[BR]', '<br>');
+    l[20858] = escapeHTML(l[20858])
+        .replace('[A]', '<a class="clickurl" target="_blank" href="/support">')
+        .replace('[/A]', '</a>');
     l[20189] = escapeHTML(l[20189]).replace('[B]', '<b>').replace('[/B]', '</b>');
     l[20192] = escapeHTML(l[20192]).replace('[B]', '<b>').replace('[/B]', '</b>');
     l[20193] = escapeHTML(l[20193]).replace('[B]', '<b>').replace('[/B]', '</b>');
@@ -1327,8 +1370,13 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[/A]', '</a>');
     l[24431] = escapeHTML(l[24431]).replace('[A]', '<a href="/repay" class="clickurl">').replace('[/A]', '</a>')
         .replace('[S]', '<span>').replace('[/S]', '</span>');
+    l[24674] = escapeHTML(l[24674])
+        .replace('[A]', '<a class="clickurl" target="_blank" href="/support">')
+        .replace('[/A]', '</a>');
     l[24708] = escapeHTML(l[24708]).replace('%s', '" * / : < > ? \\ |');
     l[24852] = escapeHTML(l[24852])
+        .replace('[A2]', '<a class="clickurl" target="_blank" href="/support">')
+        .replace('[/A2]', '</a>')
         .replace('[A]', '<a target="_blank" class="green-link" href="https://blog.mega.io">')
         .replace('[/A]', '</a>');
     l.achievem_dialogfootertext = escapeHTML(l.achievem_dialogfootertext)
@@ -1421,6 +1469,9 @@ mBroadcaster.once('boot_done', function populate_l() {
     l.no_email_try_again = escapeHTML(l.no_email_try_again).replace('[A]', '<a class="try-again">')
         .replace('[/A]', '</a>');
     l.contact_support_email = escapeHTML(l.contact_support_email)
+        .replace('[A]', '<a class="clickurl" target="_blank" href="/support">')
+        .replace('[/A]', '</a>');
+    l.no_payment_providers = escapeHTML(l.no_payment_providers)
         .replace('[A]', '<a class="clickurl" target="_blank" href="/support">')
         .replace('[/A]', '</a>');
     l.agree_s4_tos = escapeHTML(l.agree_s4_tos)
@@ -1961,6 +2012,12 @@ mBroadcaster.once('boot_done', function populate_l() {
     l.stripe_generic_decline_error = escapeHTML(l.stripe_generic_decline_error)
         .replace('[A]', '<a class="clickurl" target="_blank" href="/support">')
         .replace('[/A]', '</a>');
+    l.edit_card_error_des = escapeHTML(l.edit_card_error_des)
+        .replace('[A]', '<a class="clickurl" target="_blank" href="/support">')
+        .replace('[/A]', '</a>');
+    l.card_info_error_desc = escapeHTML(l.card_info_error_desc)
+        .replace('[A]', '<a class="clickurl" target="_blank" href="/support">')
+        .replace('[/A]', '</a>');
 
     l.vpn_to_disable_text = escapeHTML(l.vpn_to_disable_text)
         .replace('[A]', `<a href="${cancelSubLink}" target="_blank">`)
@@ -1976,6 +2033,9 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace(/\[LI]/g, '<li class="">').replace(/\[\/LI]/g, '</li>');
 
     l.error_fetching_items = escapeHTML(l.error_fetching_items)
+        .replace('[A]', '<a class="clickurl" target="_blank" href="/support">')
+        .replace('[/A]', '</a>');
+    l.eplusplus_create_failed = escapeHTML(l.eplusplus_create_failed)
         .replace('[A]', '<a class="clickurl" target="_blank" href="/support">')
         .replace('[/A]', '</a>');
 
