@@ -237,6 +237,14 @@ function setDateTimeFormat(locales, format) {
                 options.hour = 'numeric';
                 options.minute = 'numeric';
                 break;
+            case 23:
+                options.hourCycle = undefined;
+                options.year = 'numeric';
+                options.month = 'long';
+                options.day = 'numeric';
+                options.hour = 'numeric';
+                options.minute = 'numeric';
+                break;
         }
     }
 
@@ -1040,6 +1048,17 @@ function toLocaleTime(unixtime) {
         return time2date(unixtime, 21);
     }
     return locales.startsWith('fr') ? time2date(unixtime, 22).replace(':', ' h ') : time2date(unixtime, 22);
+}
+
+/**
+ * Returns a formatted long date+time string for the given timestamp, respecting the user's locale hour cycle.
+ * @param {Number} unixtime UNIX timestamp in seconds.
+ * @returns {String} Formatted date+time string, e.g. "June 9, 2026 at 2:30 PM".
+ */
+function toLocaleDateTimeLong(unixtime) {
+    'use strict';
+    const {country} = getCountryAndLocales();
+    return time2date(unixtime, fmconfig.uidateformat || country === 'ISO' ? 8 : 23);
 }
 
 //----------------------------------------------------------------------------
