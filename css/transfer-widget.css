@@ -741,7 +741,7 @@
 /*overquota banner*/
 .transfer-root .banner {
     width: 100%;
-    height: var(--tpw-banner-height);
+    min-height: var(--tpw-banner-height);
     min-width: 148px;
     background: var(--mobile-notification-error);
     padding: 16px;
