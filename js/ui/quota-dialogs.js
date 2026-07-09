@@ -661,6 +661,12 @@ lazy(mega.ui, 'quotaDialogs', () => {
             mega.ui.quotaDialogs.dismissDialog();
             return 0xDEAD;
         });
+        if (window.u_attr) {
+            viewAllPlans.removeAttribute('target');
+        }
+        else {
+            viewAllPlans.setAttribute('target', '_blank');
+        }
     };
 
     const showsCurrentPlan = (mode) =>
@@ -1190,6 +1196,10 @@ lazy(mega.ui, 'quotaDialogs', () => {
             if (mega.ui.sheet.name === 'quota-dialog') {
                 navigating = true;
                 mega.ui.sheet.hide();
+                closeCallback = false;
+                if (lastOptions) {
+                    lastOptions.beforeClose = false;
+                }
             }
         },
         EVENTS,

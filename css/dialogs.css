@@ -10841,6 +10841,9 @@ body.web-desktop .mega-dialog.s4-setup-dialog {
 
 /* Quota dialogs */
 
+.mega-component.mega-sheet.quota-dialog {
+    z-index: 1100;
+}
 .mega-component.modal-dialog.quota-dialog .sheet {
     min-width: 1192px;
     max-width: 1192px;
