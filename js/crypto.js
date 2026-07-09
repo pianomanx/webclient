@@ -348,7 +348,9 @@ function api_reqfailed(channel, error) {
                 // if fm-overlay click handler was initialized, we remove the handler to prevent dialog skip
                 $('.fm-dialog-overlay').off('click.fm');
 
-                msgDialog('>error', false, dialogTitle, reasonText);
+                msgDialog('>error', false, dialogTitle, reasonText, () => {
+                    loadSubPage('login');
+                });
             }
         });
     }
