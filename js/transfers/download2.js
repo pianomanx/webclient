@@ -1714,6 +1714,11 @@ var dlmanager = {
             return;
         }
 
+        if (String(page).startsWith('pro')) {
+            this.logger.info('showOverQuotaDialog', 'on pro/propay page, not re-opening.');
+            return;
+        }
+
         if ($('.achievements-list-dialog').is(':visible')) {
             this.logger.info('showOverQuotaDialog', 'Achievements dialog visible.');
             return;
