@@ -1360,16 +1360,16 @@ lazy(mega.devices, 'ui', () => {
          * @returns {Boolen} Whether the node is in inbox
          */
         isDeprecated(node) {
-            if (window.vw) {
+            if (window.vw || !M.InboxID) {
                 return false;
             }
 
-            if (M.InboxID && (node.h === M.InboxID || node.p === M.InboxID)) {
+            if (node.h === M.InboxID || node.p === M.InboxID) {
                 return true;
             }
 
-            const path = M.getPath(node.h);
-            return path.length === 3 && path[2] === M.InboxID;
+            const parent = M.d[node.p];
+            return !!parent && parent.p === M.InboxID;
         }
 
         /**

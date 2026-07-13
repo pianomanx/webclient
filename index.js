@@ -1738,11 +1738,18 @@ function init_page() {
 
             assert(!is_chatlink);
             mega.initLoadReport();
-            loadfm();
 
-            if (id) {
-                M.currentdirid = id;
-            }
+            M.sqliteCheck()
+                .catch((ex) => {
+                    console.info("Failed to initialize sqlite layer, continuing anyway...", ex);
+                })
+                .finally(() => {
+                    loadfm();
+
+                    if (id) {
+                        M.currentdirid = id;
+                    }
+                });
         }
         else if ((!pfid || flhashchange) && (id && id !== M.currentdirid || page === 'start' || page === 'fm/pwm')) {
 
