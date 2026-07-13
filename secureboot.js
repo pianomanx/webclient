@@ -3008,6 +3008,10 @@ else if (!browserUpdate) {
             's4:fm_s4_policy_properties_js': {f:'js/fm/s4/properties-policy.js', n: 'fm_s4_policy_properties_js', j:1},
             's4:kernel': {f:'js/utils/s4.js', n: 'js_utils_s4_js', j: 1}
         },
+        'sqlite': {
+            'sqlite_js': {f:'js/sqlite.js', n: 'sqlite_js', j: 1},
+            'sqlite3_promiser_js': {f:'js/vendor/sqlite3-worker1-promiser.js', n: 'sqlite3_promiser_js', j:1}
+        },
         'rewind': {
             'rewind_css': {f:'css/rewind.css', n: 'rewind_css', j:2, w:5},
             'rewind_js': {f:'js/rewind/index.js', n: 'rewind_js', j: 1, w: 1},
