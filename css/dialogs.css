@@ -10834,9 +10834,29 @@ body.web-desktop .mega-dialog.s4-setup-dialog {
 .mega-sheet.discount-offer .promo-banner {
     background: url("../images/mega/promo/discount-banner.webp");
 }
-
+.mega-sheet.discount-offer.discount-offer-multi .promo-banner {
+    background: url("../images/mega/promo/discount-banner@2x.webp");
+}
+.mega-sheet.discount-offer.discount-offer-multi .main {
+    padding: 0 22px;
+}
+.mega-sheet.discount-offer.discount-offer-multi .content.ps {
+    padding-inline: 22px;
+    margin-left: -22px;
+    margin-right: -22px;
+}
 .theme-dark .mega-sheet.discount-offer .close {
     color: var(--mobile-button-primary-pressed);
+}
+.mega-sheet.discount-offer .discount-carousel .carousel-page {
+    display: block;
+    border: var(--mobile-border-subtle) 1px solid;
+    border-radius: 12px;
+    padding: 24px;
+    box-sizing: border-box;
+}
+.mega-sheet.discount-offer.discount-offer-multi .sheet {
+    max-width: 1000px;
 }
 
 /* Quota dialogs */
