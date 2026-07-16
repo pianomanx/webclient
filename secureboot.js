@@ -2266,6 +2266,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/ui/slideshow/settings/speed.js', n: 'slideshowSpeedSetting_js', j:1});
     jsl.push({f:'js/ui/slideshow/settings/repeat.js', n: 'slideshowRepeatSetting_js', j:1});
     jsl.push({f:'js/ui/slideshow/settings/playVid.js', n: 'slideshowPlayVidSetting_js', j:1});
+    jsl.push({f:'js/ui/slideshow/settings/caption.js', n: 'slideshowCaptionSetting_js', j:1});
     jsl.push({f:'js/ui/slideshow/settings/sub.js', n: 'slideshowSubSetting_js', j:1});
     jsl.push({f:'js/ui/slideshow/settings/settingsManager.js', n: 'slideshowSettingsManager_js', j:1});
     jsl.push({f:'js/ui/imagesViewer.js', n: 'imagesViewer_js', j:1});
@@ -3007,6 +3008,10 @@ else if (!browserUpdate) {
             's4:fm_s4_policies_js': {f:'js/fm/s4/policies.js', n: 'fm_s4_policies_js', j:1},
             's4:fm_s4_policy_properties_js': {f:'js/fm/s4/properties-policy.js', n: 'fm_s4_policy_properties_js', j:1},
             's4:kernel': {f:'js/utils/s4.js', n: 'js_utils_s4_js', j: 1}
+        },
+        'sqlite': {
+            'sqlite_js': {f:'js/sqlite.js', n: 'sqlite_js', j: 1},
+            'sqlite3_promiser_js': {f:'js/vendor/sqlite3-worker1-promiser.js', n: 'sqlite3_promiser_js', j:1}
         },
         'rewind': {
             'rewind_css': {f:'css/rewind.css', n: 'rewind_css', j:2, w:5},

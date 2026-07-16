@@ -251,7 +251,7 @@ MegaData.prototype.getPath = function(id) {
         }
 
         // skip devices
-        const n = M.onDeviceCenter && this.dcd[id] ? false : M.getNodeByHandle(id);
+        const n = id && !(M.onDeviceCenter && this.dcd[id] || String(id).includes('/')) && M.getNodeByHandle(id);
 
         if (
             n
@@ -390,7 +390,8 @@ MegaData.prototype.isCustomView = function(pathOrID) {
         return false;
     }
     var result = Object.create(null);
-    const node = M.getNodeByHandle(pathOrID.substr(0, 8));
+    const possibleId = pathOrID.substr(0, 8);
+    const node = possibleId.length === 8 && !possibleId.includes('/') && M.getNodeByHandle(possibleId);
 
     result.original = pathOrID;
 
@@ -3028,21 +3029,7 @@ MegaData.prototype.getRecentNodes = function(limit, until) {
         until = until || Math.round((Date.now() - 7776e6) / 1e3);
 
         if (fmdb) {
-            var dbRubFilter = rubFilter;
-            var options = {
-                limit: limit,
-
-                query: function(db) {
-                    return db.orderBy('t').reverse().filter(dbRubFilter)
-                        .until((row) => {
-                            return until > row.t;
-                        });
-                },
-                include: function(row) {
-                    return row.t > until;
-                }
-            };
-            fmdb.getbykey('f', options)
+            fmdb.recent(limit, until, rubFilter)
                 .then((nodes) => {
                     if (nodes.length) {
                         const sort = M.getSortByDateTimeFn();
@@ -3195,6 +3182,7 @@ MegaData.prototype.getRecentActionsList = function(limit, until) {
 /**
  * Retrieve all folders hierarchy starting from provided handle
  * @param {String} h The root node handle
+ * @param {Object} [seen] previously seen handles
  * @return {Array} node handles
  */
 MegaData.prototype.getTreeHandles = function _(h, seen) {
@@ -4270,6 +4258,10 @@ MegaData.prototype.getNameByHandle = function(handle) {
  */
 MegaData.prototype.getNodeByHandle = function(handle) {
     "use strict";
+
+    if (!handle) {
+        return false;
+    }
 
     if (this.d[handle]) {
         return this.d[handle];

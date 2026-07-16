@@ -29,3 +29,5 @@ contrib/Electron/main.js
 js/chat/emojidata/emojis.json
 eslint-local-rules.js
 Gruntfile.js
+sqlite3.js
+sqlite3-worker1.js
