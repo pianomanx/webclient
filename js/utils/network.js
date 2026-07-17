@@ -481,7 +481,7 @@ function eventlog(id, msg, once) {
 
 eventlog.sent = Object.create(null);
 eventlog.ignore10d = new Set([
-    99988, 500510, 501024
+    99988, 500510, 501024, 500243, 500245
 ]);
 
 /**
