@@ -2155,10 +2155,6 @@ var slideshowid;
 
         if ($.autoplay === id) {
             queueMicrotask(() => {
-                // Autoplay with audio is blocked by browsers
-                if (!$(document).fullScreen()) {
-                    $video.prop('muted', true);
-                }
                 $playVideoButton.trigger('click');
             });
             delete $.autoplay;
