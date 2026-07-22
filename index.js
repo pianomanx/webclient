@@ -1023,6 +1023,10 @@ function init_page() {
         }
         loadSubPage('fm');
     }
+    else if (page.substr(0, 5) === 'mtool') {
+        sessionStorage.mtool = 1;
+        loadSubPage('fm');
+    }
     else if (page.substr(0, 8) === 's4-setup') {
         sessionStorage.s4Setup = 1;
         loadSubPage('fm/s4');
@@ -3596,7 +3600,7 @@ mBroadcaster.addListener('fm:initialized', () => {
 mBroadcaster.once('mega:openfolder', () => {
     'use strict';
 
-    const {previewNode, statsHandle: ph, s4Setup} = sessionStorage;
+    const {previewNode, statsHandle: ph, s4Setup, mtool} = sessionStorage;
     if (previewNode) {
         sessionStorage.removeItem('previewNode');
 
@@ -3611,6 +3615,13 @@ mBroadcaster.once('mega:openfolder', () => {
     }
     else if (s4Setup) {
         loadSubPage('fm/s4');
+    }
+    else if (mtool) {
+        sessionStorage.removeItem('mtool');
+
+        if (mega.migrate) {
+            mega.migrate.showDialog();
+        }
     }
 
     // Send some data to mega.io that we logged in
