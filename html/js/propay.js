@@ -3923,6 +3923,7 @@ pro.propay = {
                 return;
             }
             pro.propay.trial.trialId = result.id;
+            // Trial is always stripe. If this changes, do not pass true, instead pass gate === stripe
             addressDialog.processUtcResult({'EUR': result.url}, true, result.id);
         }).catch((ex) => {
             eventlog(500720, String(ex));

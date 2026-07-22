@@ -2782,14 +2782,16 @@ var addressDialog = {
      * Redirect to the site
      * @param {String} utcResult containing the url to redirect to
      */
-    redirectToSite: function(utcResult) {
+    redirectToSite: function(utcResult, isStripe) {
+        'use strict';
 
         var url = utcResult.EUR['url'];
-        if (pro.propay.currentGateway && pro.propay.currentGateway.gatewayId === 16) {
-            window.location = url;
+        // Only ECP (16) and Stripe (19) reach here; Stripe always needs lang, ECP never does
+        if (isStripe) {
+            window.location = url + '?lang=' + lang;
         }
         else {
-            window.location = url + '?lang=' + lang;
+            window.location = url;
         }
     },
 
@@ -3672,7 +3674,7 @@ var addressDialog = {
         }
         else {
             if (utcResult.EUR.url) {
-                return this.redirectToSite(utcResult);
+                return this.redirectToSite(utcResult, isStripe);
             }
             // Hide the loading animation and show the error
             pro.propay.hideLoadingOverlay();
