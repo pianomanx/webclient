@@ -2917,8 +2917,8 @@ var addressDialog = {
         }
 
         if (fminitialized) {
-            pro.getTargetedDiscountInfo().then((dci) => {
-                mega.ui.header.showTargetedDiscountButton(dci);
+            pro.getTargetedDiscountInfo().then((dcis) => {
+                mega.ui.header.showTargetedDiscountButton(dcis);
             });
         }
 
