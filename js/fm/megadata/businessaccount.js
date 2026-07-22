@@ -1136,6 +1136,9 @@ BusinessAccount.prototype.getListOfPaymentGateways = function (forceUpdate) {
                 var res2 = [];
                 for (var h = 0; h < res.length; h++) {
                     if (res[h].supportsBusinessPlans) {
+                        if (d && localStorage.useDevOptions) {
+                            res[h].displayName = pro.getPaymentGatewayName(res[h].gatewayId, res[h]).displayName;
+                        }
                         res2.push(res[h]);
                     }
                 }

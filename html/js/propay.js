@@ -3923,6 +3923,7 @@ pro.propay = {
                 return;
             }
             pro.propay.trial.trialId = result.id;
+            // Trial is always stripe. If this changes, do not pass true, instead pass gate === stripe
             addressDialog.processUtcResult({'EUR': result.url}, true, result.id);
         }).catch((ex) => {
             eventlog(500720, String(ex));
@@ -4140,15 +4141,124 @@ pro.propay = {
             || pro.membershipPlans.find(plan => plan[alIndex] === al && plan[monthIndex] === 1);
     },
 
+    renderDiscountOffer(dci, matchedPlanObj, cardOptions) {
+        'use strict';
+
+        const {
+            al,       // Account level
+            dc,       // Discount code
+            m,        // Months
+            lcc,      // Currency
+            ldtp,     // Discount price
+            ldtpn,    // Discount net price
+            // ltp,   // Current price
+            // ltpn,  // Current net price
+            edtp,     // Discount price (Eur)
+            edtpn,    // Discount net price (Eur)
+            // etp,   // Current price (Eur)
+            // etpn,  // Current net price (Eur)
+            pd,       // Discount value
+            ex,       // Expiration time
+            txe,      // Tax excempt
+            txn       // Tax label
+        } = dci;
+        const isEuro = !lcc || lcc === 'EUR';
+        const currency = isEuro && 'EUR' || lcc;
+        const isBeforeTax = txe === 2;
+        const newPrice = isEuro ? (isBeforeTax ? edtpn : edtp) : (isBeforeTax ? ldtpn : ldtp);
+        const prevPrice = matchedPlanObj.getPricing(true)[isEuro ? 'priceEuro' : 'price'];
+
+        const template = mega.templates.getTemplate('discount-dialog-content-temp')[0];
+        template.querySelector('h1').textContent = pro.getProPlanName(al);
+        template.querySelector('.promo-overtext').textContent = l.notif_limited_time_offer;
+
+        const percentageDiscount = pro.calculateSavings(
+            [pd, matchedPlanObj.hasYearlyDiscount ? pro.yearlyDiscountPercentage : 0]);
+        template.querySelector('.duration').appendChild(
+            parseHTML(mega.icu.format(l.for_months, m).replace('%1', formatPercentage(percentageDiscount)))
+        );
+
+        template.querySelector('.previous-price .amount').textContent = formatCurrency(
+            prevPrice,
+            currency,
+            'narrowSymbol'
+        );
+        template.querySelector('.price').textContent =
+            formatCurrency(newPrice, currency, 'narrowSymbol') + (isEuro ? '' : '*');
+
+        const featureArr = [
+            l.mega_vpn,
+            l.mega_pwm,
+        ];
+        const features = template.querySelector('.features');
+
+        for (let i = 0; i < featureArr.length; i++) {
+            const row = mCreateElement('div', { class: 'flex flex-row gap-2 items-center my-1' }, [], features);
+
+            mCreateElement('i', { class: 'sprite-fm-mono icon-check-thin-outline red icon-size-6' }, [], row);
+            const txt = mCreateElement('div', null, [], row);
+
+            txt.textContent = featureArr[i];
+        }
+
+        const hint = [];
+
+        if (!isEuro) {
+            hint.push(l.est_price);
+        }
+
+        if (isBeforeTax) {
+            hint.push(`${l.t_may_appy.replace('%1', txn)}`);
+        }
+
+        if (hint.length) {
+            const hintEl = template.querySelector('.price-hint');
+
+            if (hintEl) {
+                hintEl.textContent = `* ${hint.join(' ')}`;
+                hintEl.classList.remove('hidden');
+            }
+        }
+
+        const perMonth = template.querySelector('.per-month');
+
+        perMonth.textContent = currency;
+
+        const valueKeys = [
+            [matchedPlanObj.storage, l.of_storage],
+            [matchedPlanObj.baseTransfer * m, l.of_transfer]
+        ];
+
+        for (let i = valueKeys.length; i--;) {
+            const value = [valueKeys[i][0]];
+            const el = mCreateElement('div', { class: 'font-body-1-bold text-color-medium' });
+            el.textContent = valueKeys[i][1].replace('%1', bytesToSize(value, undefined, 4));
+            perMonth.parentNode.after(el);
+        }
+
+        if (cardOptions) {
+            const cardActions = mCreateElement('div', { class: 'discount-card-actions mt-4' }, [], template);
+            if (!cardOptions.sharedCountdown) {
+                const endsInInfo = mCreateElement('div', { class: 'ends-in-info' }, [], cardActions);
+                cardOptions.updates.push(cardOptions.createCountdown(endsInInfo, ex));
+            }
+            const actions = mCreateElement('div', { class: 'flex flex-row justify-end mt-2' }, [], cardActions);
+            cardOptions.createGrabButton(actions, dc);
+            cardOptions.carousel.addPage({ element: template });
+        }
+
+        return template;
+    },
+
     /**
-     * @param {Object.<String, String|Number>} dci Discount data received from API
+     * @param {Object[]} dcis Discount data received from API
      * @param {Boolean} ignoreCooldown Whether to ignore the cooldown and show offer right away or not
      * @returns {Promise<void>}
      */
-    async showDiscountOffer(dci, ignoreCooldown) {
+    async showDiscountOffer(dcis, ignoreCooldown) {
         'use strict';
 
-        if (!dci || is_mobile || typeof page !== 'string' || page.includes('propay')) {
+        if (is_mobile || typeof page !== 'string' || page.includes('propay')) {
             return;
         }
 
@@ -4158,29 +4268,18 @@ pro.propay = {
             return;
         }
 
-        const {
-            al,  // Account level
-            dc,  // Discount code
-            m,   // Months
-            lcc, // Currency
-            ldtp, // Discount price
-            ldtpn, // Discount net price
-            ltp, // Current price
-            ltpn, // Current net price
-            edtp, // Discount price (Eur)
-            edtpn,  // Discount net price (Eur)
-            etp, // Current price (Eur)
-            etpn, // Current net price (Eur)
-            pd,   // Discount value
-            ex,   // Expiration time
-            txe,  // Tax excempt
-            txn   // Tax label
-        } = dci;
+        let offers = [];
+        for (let i = 0; i < dcis.length; i++) {
+            const dci = dcis[i];
+            const matchedPlan = await pro.propay.getDiscountedPlanInfo(dci.al, dci.m);
+            const matchedPlanObj = pro.getPlanObj(matchedPlan);
 
-        const matchedPlan = await pro.propay.getDiscountedPlanInfo(al, m);
-        const matchedPlanObj = pro.getPlanObj(matchedPlan);
+            if (matchedPlanObj) {
+                offers.push({ dci, matchedPlanObj });
+            }
+        }
 
-        if (!matchedPlan || !matchedPlanObj) {
+        if (!offers.length) {
             return;
         }
 
@@ -4192,29 +4291,39 @@ pro.propay = {
         if (ignoreCooldown) { // The dialog invoked manually
             eventlog(501022);
         }
-        else if (discountOffers && discountOffers[dc]) { // Dialog is on cooldown
-            const timeDif = Date.now() - discountOffers[dc];
+        else if (discountOffers) { // Drop any offers still within their cooldown window
+            offers = offers.filter(({ dci }) => {
+                const seenAt = discountOffers[dci.dc];
+                return !seenAt || Date.now() - seenAt >= cooldown;
+            });
 
-            if (timeDif < cooldown) {
+            if (!offers.length) {
                 return;
             }
 
             eventlog(501020);
         }
 
-        discountOffers = discountOffers || Object.create(null);
+        offers = offers.slice(0, 4);
 
+        const isMultiple = offers.length > 1;
         let offerTimer = null;
 
         const storeViewTime = () => {
-            discountOffers[dc] = Date.now();
+            discountOffers = discountOffers || Object.create(null);
+            for (let i = offers.length; i--;) {
+                discountOffers[offers[i].dci.dc] = Date.now();
+            }
             mega.attr.set('discountoffers', JSON.stringify(discountOffers), -2, true);
         };
 
         const doCleanup = () => {
             sheet.overlayNode.classList.remove('overflow-hidden', 'discount-offer');
             sheet.headerTitleNode.classList.remove('h-40');
-            sheet.contentNode.Ps.destroy();
+
+            if (sheet.contentNode.Ps) {
+                sheet.contentNode.Ps.destroy();
+            }
 
             if (offerTimer) {
                 clearInterval(offerTimer);
@@ -4223,53 +4332,127 @@ pro.propay = {
             storeViewTime();
         };
 
-        const template = mega.templates.getTemplate('discount-dialog-content-temp')[0];
-        const isEuro = !lcc || lcc === 'EUR';
-        const currency = isEuro && 'EUR' || lcc;
-        const isBeforeTax = txe === 2;
-        const actions = mCreateElement('div', { class: 'flex flex-row justify-end' });
+        const createGrabButton = (parentNode, dc) => {
+            MegaButton.factory({
+                parentNode,
+                text: l.grab_deal,
+                componentClassname: 'promo-button mx-2',
+                type: 'normal'
+            }).on('click.promoAccept', () => {
+                eventlog(501019);
+                sheet.hide();
 
-        MegaButton.factory({
-            parentNode: actions,
-            text: l.grab_deal,
-            componentClassname: 'promo-button mx-2',
-            type: 'normal'
-        }).on('click.promoAccept', () => {
-            eventlog(501019);
-            sheet.hide();
-
-            onIdle(() => {
-                doCleanup();
-                loadSubPage(`discount${dc}`);
+                onIdle(() => {
+                    doCleanup();
+                    loadSubPage(`discount${dc}`);
+                });
             });
-        });
+        };
 
-        const remainingLabel = mCreateElement('div', { class: 'font-bold text-color-high' });
-        remainingLabel.textContent = l.offer_ends_in;
+        const createCountdown = (parentNode, ex) => {
+            const remainingLabel = mCreateElement('div', { class: 'font-bold text-color-high' }, [], parentNode);
+            remainingLabel.textContent = l.offer_ends_in;
 
-        const remainingCounter = mCreateElement(
-            'div',
-            { class: 'remaining flex flex-row items-center mt-2 text-color-high' }
-        );
+            const remainingCounter = mCreateElement(
+                'div',
+                { class: 'remaining flex flex-row items-center mt-2 text-color-high' },
+                [],
+                parentNode
+            );
 
+            const addDigit = (units) => {
+                const digitClasses = 'font-bold me-1 text-color-high';
+                let currentValue = 0;
+                let digit = mCreateElement('div', { class: digitClasses }, [], remainingCounter);
+                digit.textContent = currentValue;
+
+                const label = mCreateElement('span', { class: 'text-color-medium me-3' }, [], remainingCounter);
+
+                // Update function
+                return (newValue) => {
+                    if (newValue !== currentValue) {
+                        currentValue = newValue;
+
+                        const newNode = mCreateElement('div', { class: digitClasses });
+                        newNode.textContent = newValue;
+
+                        digit.replaceWith(newNode);
+                        digit = newNode;
+                    }
+
+                    label.textContent = mega.icu.format(units, newValue);
+                };
+            };
+
+            const updateDays = addDigit(l.plural_day);
+            const updateHours = addDigit(l.plural_hour);
+            const updateMinutes = addDigit(l.plural_minute);
+
+            return () => {
+                const now = parseInt(Date.now() / 1000);
+                const difference = ex - now;
+
+                if (difference <= 0) {
+                    remainingCounter.textContent = l.notif_offer_expired;
+                    return false;
+                }
+
+                updateDays(Math.floor(difference / (60 * 60 * 24)));
+                updateHours(Math.floor((difference % (60 * 60 * 24)) / (60 * 60)));
+                updateMinutes(Math.floor((difference % (60 * 60)) / 60));
+
+                return true;
+            };
+        };
+
+        const updates = [];
+        const sharedCountdown = offers.every(({ dci }) => dci.ex === offers[0].dci.ex);
+        const templates = [];
+        const classList = ['discount-offer'];
+        let contents = templates;
+        let footer;
+        let cardOptions;
+
+        if (isMultiple) {
+            const wrapper = mCreateElement('div', { class: 'discount-offers' });
+            const carousel = new MegaCarousel({
+                parentNode: wrapper,
+                componentClassname: 'discount-carousel',
+                perPage: 2
+            });
+
+            classList.push('discount-offer-multi');
+            contents = [wrapper];
+            cardOptions = { sharedCountdown, carousel, updates, createCountdown, createGrabButton };
+        }
+
+        for (let i = 0; i < offers.length; i++) {
+            const { dci, matchedPlanObj } = offers[i];
+            templates.push(this.renderDiscountOffer(dci, matchedPlanObj, cardOptions));
+        }
+
+        if (sharedCountdown) {
+            const endsInInfo = mCreateElement('div', { class: 'ends-in-info' });
+            updates.push(createCountdown(endsInInfo, offers[0].dci.ex));
+            const slot = [endsInInfo];
+            if (!isMultiple) {
+                const actions = mCreateElement('div', { class: 'flex flex-row justify-end' });
+                createGrabButton(actions, offers[0].dci.dc);
+                slot.push(actions);
+            }
+            footer = { slot };
+        }
 
         sheet.show({
             name: 'targeted-discount-dialog',
-            classList: ['discount-offer'],
-            contents: [template],
+            classList,
+            contents,
             centered: false,
             showClose: true,
             preventBgClosing: true,
-            footer: {
-                slot: [
-                    mCreateElement('div', { class: 'ends-in-info' }, [ remainingLabel, remainingCounter ]),
-                    actions
-                ]
-            },
+            footer,
             onShow: () => {
                 const { contentNode, headerTitleNode, overlayNode } = sheet;
-                const newPrice = isEuro ? (isBeforeTax ? edtpn : edtp) : (isBeforeTax ? ldtpn : ldtp);
-                const prevPrice = matchedPlanObj.getPricing(true)[isEuro ? 'priceEuro' : 'price'];
 
                 const img = mCreateElement(
                     'div',
@@ -4288,143 +4471,30 @@ pro.propay = {
                 overlayNode.classList.add('overflow-hidden');
                 headerTitleNode.classList.add('h-40');
 
-                contentNode.querySelector('h1').textContent = pro.getProPlanName(al);
-                contentNode.querySelector('.promo-overtext').textContent = l.notif_limited_time_offer;
-
-                const percentageDiscount = pro.calculateSavings(
-                    [pd, matchedPlanObj.hasYearlyDiscount ? pro.yearlyDiscountPercentage : 0]);
-
-                contentNode.querySelector('.duration').appendChild(
-                    parseHTML(mega.icu.format(l.for_months, m).replace('%1', formatPercentage(percentageDiscount)))
-                );
-                contentNode.querySelector('.previous-price .amount').textContent = formatCurrency(
-                    prevPrice,
-                    currency,
-                    'narrowSymbol'
-                );
-
-                const price = formatCurrency(newPrice, currency, 'narrowSymbol') + (isEuro ? '' : '*');
-
-                contentNode.querySelector('.price').textContent = price;
-
-                const featureArr = [
-                    l.mega_vpn,
-                    l.mega_pwm,
-                    l.obj_storage
-                ];
-                const features = contentNode.querySelector('.features');
-
-                for (let i = 0; i < featureArr.length; i++) {
-                    const row = mCreateElement('div', { class: 'flex flex-row gap-2 items-center my-1' }, [], features);
-
-                    mCreateElement('i', { class: 'sprite-fm-mono icon-check-thin-outline red icon-size-6' }, [], row);
-                    const txt = mCreateElement('div', null, [], row);
-
-                    txt.textContent = featureArr[i];
-                }
-
-                const addDigit = (units) => {
-                    const digitClasses = 'font-bold me-1 text-color-high';
-                    let currentValue = 0;
-                    let digit = mCreateElement('div', { class: digitClasses }, [], remainingCounter);
-                    digit.textContent = currentValue;
-
-                    const label = mCreateElement('span', { class: 'text-color-medium me-3' }, [], remainingCounter);
-
-                    // Update function
-                    return (newValue) => {
-                        if (newValue !== currentValue) {
-                            currentValue = newValue;
-
-                            const newNode = mCreateElement('div', { class: digitClasses });
-                            newNode.textContent = newValue;
-
-                            digit.replaceWith(newNode);
-                            digit = newNode;
+                const tick = () => {
+                    let anyLive = false;
+                    for (let i = updates.length; i--;) {
+                        if (updates[i]()) {
+                            anyLive = true;
                         }
+                    }
 
-                        label.textContent = mega.icu.format(units, newValue);
-                    };
-                };
-
-                const updateDays = addDigit(l.plural_day);
-                const updateHours = addDigit(l.plural_hour);
-                const updateMinutes = addDigit(l.plural_minute);
-
-                const update = () => {
-                    const now = parseInt(Date.now() / 1000);
-                    const difference = ex - now;
-
-                    if (difference <= 0) {
-                        remainingCounter.textContent = l.notif_offer_expired;
+                    if (!anyLive) {
                         clearInterval(offerTimer);
-                        return false;
-                    }
-
-                    updateDays(Math.floor(difference / (60 * 60 * 24)));
-                    updateHours(Math.floor((difference % (60 * 60 * 24)) / (60 * 60)));
-                    updateMinutes(Math.floor((difference % (60 * 60)) / 60));
-
-                    return true;
-                };
-
-                update();
-                offerTimer = setInterval(update, 60e3);
-
-                const attachHint = () => {
-                    const hint = [];
-
-                    if (!isEuro) {
-                        hint.push(l.est_price);
-                    }
-
-                    if (isBeforeTax) {
-                        hint.push(`${l.t_may_appy.replace('%1', txn)}`);
-                    }
-
-                    if (hint.length) {
-                        const hintEl = contentNode.querySelector('.price-hint');
-
-                        if (hintEl) {
-                            hintEl.textContent = `* ${hint.join(' ')}`;
-                            hintEl.classList.remove('hidden');
-                        }
                     }
                 };
 
-                attachHint();
-
-                const perMonth = contentNode.querySelector('.per-month');
-
-                perMonth.textContent = currency;
-
-                const planObj = pro.getPlanObj(
-                    matchedPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL],
-                    matchedPlan[pro.UTQA_RES_INDEX_MONTHS]
-                );
-
-                const valueKeys = [
-                    [planObj.storage, l.of_storage],
-                    [planObj.baseTransfer * m, l.of_transfer]
-                ];
-
-                for (let i = valueKeys.length; i--;) {
-                    const value = [valueKeys[i][0]];
-
-                    if (!value) {
-                        continue;
-                    }
-
-                    const el = mCreateElement('div', { class: 'font-body-1-bold text-color-medium' });
-                    el.textContent = valueKeys[i][1].replace('%1', bytesToSize(value, undefined, 4));
-                    perMonth.parentNode.after(el);
-                }
+                tick();
+                offerTimer = setInterval(tick, 60e3);
 
                 sheet.addClass('discount-offer');
-                contentNode.Ps = new PerfectScrollbar(contentNode);
+
+                if (!isMultiple) {
+                    contentNode.Ps = new PerfectScrollbar(contentNode);
+                }
 
                 if (!ignoreCooldown && mega.ui.header) {
-                    mega.ui.header.showTargetedDiscountButton(dci);
+                    mega.ui.header.showTargetedDiscountButton(offers.map(({ dci }) => dci));
                 }
 
                 mBroadcaster.sendMessage('trk:event', 'discountPopup', 'shown');

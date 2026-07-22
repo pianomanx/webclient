@@ -152,25 +152,31 @@ var pro = {
     async getTargetedDiscountInfo() {
         'use strict';
 
+        const dcis = [];
+
         if (!u_attr || !u_attr.mkt || !u_attr.mkt.dc) {
-            return false;
+            return dcis;
         }
 
-        let discountCode = u_attr.mkt.dc[0].dc;
+        const codes = u_attr.mkt.dc;
+        const requests = [];
 
-        if (pro.usedDiscountCode === discountCode) {
-            const unusedDiscount = u_attr.mkt.dc.find(d => d.dc !== pro.usedDiscountCode);
-            if (!unusedDiscount) {
-                return false;
+        for (let i = codes.length; i--;) {
+            if (codes[i].dc !== pro.usedDiscountCode) {
+                requests.push(api.send({a: 'dci', v: 2, dc: codes[i].dc, extra: 1}).catch(nop));
             }
-            discountCode = unusedDiscount.dc;
         }
 
-        const res = await api.send({a: 'dci', v: 2, dc: discountCode, extra: 1}).catch(nop);
+        const responses = await Promise.all(requests);
+        const now = Date.now() / 1000;
 
-        return (res && res.ex > Date.now() / 1000)
-            ? res
-            : false;
+        for (let i = responses.length; i--;) {
+            if (responses[i] && responses[i].ex > now) {
+                dcis.push(responses[i]);
+            }
+        }
+
+        return dcis;
     },
 
     /**

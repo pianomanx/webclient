@@ -1211,6 +1211,7 @@ module.exports = function(grunt) {
                     require('htmlnano')({
                         removeEmptyAttributes: false,
                         sortAttributesWithLists: false,
+                        minifyCharacterReferences: false,
                         removeComments(comments) {
                             const clean = comments.replace(/<!--[\S\s]*?-->/, '').trim();
                             if (clean) {
