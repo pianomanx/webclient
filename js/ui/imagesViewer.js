@@ -721,7 +721,8 @@ var slideshowid;
             delay.cancel(MOUSE_IDLE_TID);
             $document.off(`${idleAction}.idle`);
             $controls.off('mousemove.idle');
-            if (!mega.slideshow.settings.playVid.getValue() || !is_video(n)) {
+            const {playVid} = mega.slideshow.settings;
+            if (!(playVid && playVid.getValue()) || !is_video(n)) {
                 return;
             }
         }
@@ -1167,10 +1168,13 @@ var slideshowid;
         }
 
         // Clear previousy set data
+        const {caption} = mega.slideshow.settings;
         switchedSides = false;
         $('header .file-name', $overlay).text(n.name);
         $('header .file-size', $overlay).text(bytesToSize(n.s || 0));
-        mega.slideshow.settings.caption.draw(n);
+        if (caption && caption.draw) {
+            caption.draw(n);
+        }
         $('.viewer-error, #pdfpreviewdiv1, #docxpreviewdiv1, #xlsxpreviewdiv1', $overlay).addClass('hidden');
         $('.viewer-progress', $overlay).addClass('vo-hidden');
 
