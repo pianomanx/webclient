@@ -1857,7 +1857,7 @@ function closeDialog(ev) {
         }
         delete $.cftarget;
     }
-    else if ($.dialog !== 'terms') {
+    else if ($.dialog !== 'terms' && $.dialog !== 'Mega-Onboarding') {
         delete $.mcImport;
     }
 
