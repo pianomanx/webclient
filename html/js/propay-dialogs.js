@@ -3644,10 +3644,7 @@ var addressDialog = {
 
                 if (!addressDialog.iframePageChangeHandler) {
                     addressDialog.iframePageChangeHandler = mBroadcaster.addListener('pagechange', () => {
-                        $('iframe#stripe-widget').remove();
-                        closeStripeDialog(false, true);
-                        mBroadcaster.removeListener(addressDialog.iframePageChangeHandler);
-                        delete addressDialog.iframePageChangeHandler;
+                        addressDialog.closeStripeWidget();
                     });
                 }
 
@@ -3679,6 +3676,23 @@ var addressDialog = {
             // Hide the loading animation and show the error
             pro.propay.hideLoadingOverlay();
             this.showError(utcResult);
+        }
+    },
+
+    /**
+     * Tears down the Stripe payment widget: removes the iframe, closes the dialog and clears the
+     * pagechange listener. Safe to call from anywhere, whether or not the widget is currently shown.
+     * @returns {void}
+     */
+    closeStripeWidget() {
+        'use strict';
+
+        $('iframe#stripe-widget').remove();
+        closeStripeDialog(false, true);
+
+        if (addressDialog.iframePageChangeHandler) {
+            mBroadcaster.removeListener(addressDialog.iframePageChangeHandler);
+            delete addressDialog.iframePageChangeHandler;
         }
     },
 
