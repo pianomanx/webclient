@@ -838,6 +838,13 @@ pro.propay = {
                         }
                         return;
                     }
+                    if (!this.onPropayPage()) {
+                        if (d) {
+                            console.warn('Left the propay page during loading, do not proceed');
+                        }
+                        addressDialog.closeStripeWidget();
+                        return;
+                    }
                     this.setCachedUtcRequest(result);
                     this.processUtcResults(result, saleId).then(() => {
                         const shouldEndLoading = [
@@ -3784,7 +3791,7 @@ pro.propay = {
 
                 const propayPageVisitEventId = pro.propay.getPropayPageEventId(pro.propay.planNum);
 
-                const checkGateways = (gateways) => gateways.find((g) => {
+                const checkGateways = (gateways) => Array.isArray(gateways) && gateways.find((g) => {
                     return (g.gatewayName === this.previousPurchaseProvider);
                 });
 

@@ -2990,7 +2990,7 @@
     "change_email_error_info": "{count, plural, other {Anda hanya dapat mengubah alamat email anda hingga # kali dalam satu jam.}}",
     "charged_per_months": "{count, plural, other {%1 dibebankan setiap # bulan}}",
     "charged_yearly": "Charge %2* yearly",
-    "charged_yearly_euro": "Charge %2 yearly",
+    "charged_yearly_euro": "Billed %2 yearly",
     "chat_and_meetings_settings": "Obrolan dan rapat",
     "chat_call_button": "Obrolan",
     "chat_call_joined_multi": "{count, plural, other {%s dan # lainnya bergabung}}",

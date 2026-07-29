@@ -2990,7 +2990,7 @@
     "change_email_error_info": "{count, plural, one {V\u0103 pute\u021bi schimba adresa de e-mail doar o singur\u0103 dat\u0103 \u00eentr-o or\u0103.} few {V\u0103 pute\u021bi schimba adresa de e-mail doar de #\u00a0ori \u00eentr-o or\u0103.} other {V\u0103 pute\u021bi schimba adresa de e-mail doar de # de ori \u00eentr-o or\u0103.}}",
     "charged_per_months": "{count, plural, one {%1 pl\u0103tit la fiecare # luna} few {%1 pl\u0103tit la fiecare # luni} other {%1 pl\u0103tit la fiecare # luni}}",
     "charged_yearly": "Charge %2* yearly",
-    "charged_yearly_euro": "Charge %2 yearly",
+    "charged_yearly_euro": "Billed %2 yearly",
     "chat_and_meetings_settings": "Chaturi \u0219i \u00eent\u00e2lniri",
     "chat_call_button": "Chat",
     "chat_call_joined_multi": "{count, plural, one {%s \u0219i \u00eenc\u0103 1 s-au al\u0103turat} few {%s \u0219i a\u021bi # s-au al\u0103turat} other {%s \u0219i a\u021bi # s-au al\u0103turat}}",

@@ -2990,7 +2990,7 @@
     "change_email_error_info": "{count, plural, other {B\u1ea1n ch\u1ec9 c\u00f3 th\u1ec3 thay \u0111\u1ed5i \u0111\u1ecba\u00a0ch\u1ec9 email c\u1ee7a m\u00ecnh t\u1ed1i\u00a0\u0111a # l\u1ea7n trong m\u1ed9t gi\u1edd.}}",
     "charged_per_months": "{count, plural, other {Thu ph\u00ed %1 m\u1ed7i # th\u00e1ng}}",
     "charged_yearly": "Charge %2* yearly",
-    "charged_yearly_euro": "Charge %2 yearly",
+    "charged_yearly_euro": "Billed %2 yearly",
     "chat_and_meetings_settings": "Chat v\u00e0 h\u1ecdp\u00a0m\u1eb7t",
     "chat_call_button": "Chat",
     "chat_call_joined_multi": "{count, plural, other {%s v\u00e0 # ng\u01b0\u1eddi kh\u00e1c \u0111\u00e3 tham gia}}",

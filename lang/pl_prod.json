@@ -2990,7 +2990,7 @@
     "change_email_error_info": "{count, plural, one {Adres e-mail mo\u017cna zmieni\u0107 tylko # razy w ci\u0105gu godziny.} few {Adres e-mail mo\u017cna zmieni\u0107 maksymalnie # razy w ci\u0105gu godziny.} many {Adres e-mail mo\u017cna zmieni\u0107 maksymalnie # razy w ci\u0105gu godziny.}}",
     "charged_per_months": "{count, plural, one {%1 naliczane co miesi\u0105c} few {%1 naliczane co # miesi\u0119cy} many {%1 naliczane co # miesi\u0119cy}}",
     "charged_yearly": "Op\u0142ata %2* rocznie",
-    "charged_yearly_euro": "Op\u0142ata %2 rocznie",
+    "charged_yearly_euro": "Fakturowane %2 rocznie",
     "chat_and_meetings_settings": "Czat i spotkania",
     "chat_call_button": "Chat",
     "chat_call_joined_multi": "{count, plural, one {%s i # pozosta\u0142y do\u0142\u0105czy\u0142} few {%s i # pozosta\u0142ych do\u0142\u0105czy\u0142o} many {%s i # pozosta\u0142ych do\u0142\u0105czy\u0142o}}",
