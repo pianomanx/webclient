@@ -3936,7 +3936,7 @@
     "lightning_fast_speeds": "Velocidades ultrarr\u00e1pidas",
     "limited_transfer": "Transfer\u00eancia [S]limitada[/S]",
     "link": "Link",
-    "link_access_explainer": "{count, plural, one {Qualquer pessoa com este link pode ver e fazer o download dos dados} many {Qualquer pessoa com estes links pode ver e fazer o download dos dados} other {Qualquer pessoa com estes links pode ver e fazer o download dos dados}}",
+    "link_access_explainer": "{count, plural, one {Qualquer pessoa com este link pode ver e fazer o download do conte\u00fado} many {Qualquer pessoa com estes links pode ver e fazer o download do conte\u00fado} other {Qualquer pessoa com estes links pode ver e fazer o download do conte\u00fado}}",
     "link_activity": "Atividade do link",
     "link_activity_email_setting": "Algu\u00e9m visualizou ou interagiu com os seus arquivos",
     "link_created_with_colon": "Link criado:",
