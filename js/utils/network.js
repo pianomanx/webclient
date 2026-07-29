@@ -465,7 +465,10 @@ function eventlog(id, msg, once) {
             }
         }
 
-        if (id > 99799 && self.buildOlderThan10Days && !eventlog.ignore10d.has(id)) {
+        if (id > 99799 && !eventlog.ignore10d.has(id)
+            && (!self.buildVersion || !buildVersion.timestamp
+                || (buildVersion.timestamp + 30 * 86400) * 1000 > Date.now())) {
+
             return self.d && console.info('eventlog(%d)', id, once, [req]);
         }
 
