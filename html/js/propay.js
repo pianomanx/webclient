@@ -3791,7 +3791,7 @@ pro.propay = {
 
                 const propayPageVisitEventId = pro.propay.getPropayPageEventId(pro.propay.planNum);
 
-                const checkGateways = (gateways) => gateways.find((g) => {
+                const checkGateways = (gateways) => Array.isArray(gateways) && gateways.find((g) => {
                     return (g.gatewayName === this.previousPurchaseProvider);
                 });
 
