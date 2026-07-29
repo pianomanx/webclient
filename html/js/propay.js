@@ -838,6 +838,13 @@ pro.propay = {
                         }
                         return;
                     }
+                    if (!this.onPropayPage()) {
+                        if (d) {
+                            console.warn('Left the propay page during loading, do not proceed');
+                        }
+                        addressDialog.closeStripeWidget();
+                        return;
+                    }
                     this.setCachedUtcRequest(result);
                     this.processUtcResults(result, saleId).then(() => {
                         const shouldEndLoading = [
