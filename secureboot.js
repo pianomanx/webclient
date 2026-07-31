@@ -399,7 +399,7 @@ function getCleanSitePath(path) {
             }
             // Google Ads click: capture gclid/wbraid/gbraid/ts from the URL.
             var gAds = {};
-            var gAKeys = ['gclid', 'wbraid', 'gbraid', 'gclts'];
+            var gAKeys = ['gclid', 'wbraid', 'gbraid', 'gclts', 'gap'];
             for (var i = 0; i < gAKeys.length; i++) {
                 if (path[gAKeys[i]]) {
                     gAds[gAKeys[i]] = path[gAKeys[i]];
@@ -1855,6 +1855,9 @@ else if (!browserUpdate) {
     // Do not report exceptions if this build is older than 10 days
     Object.defineProperty(self, 'buildOlderThan10Days', {
         value: !((is_extension || !nocontentcheck) && (buildVersion.timestamp + 10 * 86400) * 1000 > Date.now())
+    });
+    Object.defineProperty(self, 'buildOlderThan30Days', {
+        value: !((is_extension || !nocontentcheck) && (buildVersion.timestamp + 30 * 86400) * 1000 > Date.now())
     });
 
     if (!self.buildOlderThan10Days) {
