@@ -1856,6 +1856,9 @@ else if (!browserUpdate) {
     Object.defineProperty(self, 'buildOlderThan10Days', {
         value: !((is_extension || !nocontentcheck) && (buildVersion.timestamp + 10 * 86400) * 1000 > Date.now())
     });
+    Object.defineProperty(self, 'buildOlderThan30Days', {
+        value: !((is_extension || !nocontentcheck) && (buildVersion.timestamp + 30 * 86400) * 1000 > Date.now())
+    });
 
     if (!self.buildOlderThan10Days) {
         var __cdumps = [], __cd_t;
