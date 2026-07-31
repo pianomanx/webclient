@@ -399,7 +399,7 @@ function getCleanSitePath(path) {
             }
             // Google Ads click: capture gclid/wbraid/gbraid/ts from the URL.
             var gAds = {};
-            var gAKeys = ['gclid', 'wbraid', 'gbraid', 'gclts'];
+            var gAKeys = ['gclid', 'wbraid', 'gbraid', 'gclts', 'gap'];
             for (var i = 0; i < gAKeys.length; i++) {
                 if (path[gAKeys[i]]) {
                     gAds[gAKeys[i]] = path[gAKeys[i]];
