@@ -2181,7 +2181,7 @@
     "20427": "The account is no longer one of your contacts.",
     "20429": "After you finish upgrading to a Business account, please ensure you cancel your {0} subscription if you have not already.",
     "20430": "Upgrade completed",
-    "20431": "Sorry, no payment method is supported for Business accounts in your country. Please contact business@mega.io to help you with your Business account signup.",
+    "20431": "Sorry, no payment methods are available for Business accounts in your country.",
     "20432": "Never enter your password on a device you do not fully trust.",
     "20433": "There is no recovery procedure for lost passwords, make sure you can remember your password at all times.",
     "20454": "This adds an extra layer of protection, using encryption key rotation. Your chat security will be stronger against sophisticated attacks, but new participants will not be able to access previous messages, and you cannot create a chat link for this chat. This cannot be disabled later.",
